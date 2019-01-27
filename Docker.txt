@@ -1,0 +1,22 @@
+COPY - Used to copy files to docker image which can be seen in /bin/bash 
+
+
+
+1) If fabric plugin is not recogized, in settings.xml (C:\Program Files\Maven\apache-maven-3.6.0\conf) under plugingroup add below
+<pluginGroups>
+    <!-- pluginGroup
+     | Specifies a further group identifier to use for plugin lookup.
+    <pluginGroup>com.your.plugins</pluginGroup>
+    -->
+	<pluginGroup>io.fabric8</pluginGroup>
+  </pluginGroups>
+  
+  
+2) To instal maven add below in environment variables
+  M2_HOME:
+  C:\Program Files\Maven\apache-maven-3.6.0
+  
+  In path = C:\Program Files\Maven\apache-maven-3.6.0\bin;
+  
+  
+ 3) For docker push , in settings.xml add urusename nd password for credentials
