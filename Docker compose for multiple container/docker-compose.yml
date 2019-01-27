@@ -1,0 +1,38 @@
+version: '3'
+services:
+    db:
+        image: mongo
+        volumes:
+            - db_data:/data/db
+        restart: always
+        environment:
+             MONGO_INITDB_ROOT_USERNAME: wordpress
+             MONGO_INITDB_ROOT_PASSWORD: wordpress
+            
+    rabbit:
+        image: rabbitmq:3.7.8-management
+        ports:
+            - '15672:15672'
+            - '5671:5671'
+            - '5672:5672'
+        environment:
+             RABBITMQ_DEFAULT_USER: karthik
+             RABBITMQ_DEFAULT_PASS: karthik
+        restart: always
+        
+    application:
+        image: dockerkarthik28/dockertestingfabric:latest
+        ports:
+            - '8080:8080'
+        depends_on:
+            - db
+            - rabbit    
+        restart: always
+        healthcheck:
+              test: ["CMD", "curl", "-f", "http://192.168.99.100:8080/health"]
+              interval: 1m30s
+              timeout: 10s
+              retries: 3
+        
+volumes:
+    db_data:
