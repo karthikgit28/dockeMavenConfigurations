@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.2.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.docker.maven</groupId>
+	<artifactId>docker-maven-integrate</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>docker-maven-integrate</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+
+		<docker.image.prefix>dockerkarthik28</docker.image.prefix>
+		<docker.image.name>dockertestingfabric</docker.image.name>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- <plugin> -->
+			<!-- <groupId>com.spotify</groupId> -->
+			<!-- <artifactId>docker-maven-plugin</artifactId> -->
+			<!-- <version>1.2.0</version> -->
+			<!-- <configuration> -->
+			<!-- <dockerHost>https://192.168.99.100:2376</dockerHost> -->
+			<!-- <imageName>${docker.image.prefix}/${docker.image.name}</imageName> -->
+			<!-- <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory> -->
+			<!-- <forceTags>true</forceTags> -->
+			<!-- <serverId>docker.io</serverId> -->
+			<!-- <resources> -->
+			<!-- <resource> -->
+			<!-- <targetPath>/</targetPath> -->
+			<!-- <directory>${project.build.directory}</directory> -->
+			<!-- <include>${project.build.finalName}.war</include> -->
+			<!-- </resource> -->
+			<!-- </resources> -->
+			<!-- <imageTags> -->
+			<!-- <imageTag>${project.version}</imageTag> -->
+			<!-- <imageTag>latest</imageTag> -->
+			<!-- </imageTags> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+
+
+<!-- 			<plugin> -->
+<!-- 				<groupId>io.fabric8</groupId> -->
+<!-- 				<artifactId>docker-maven-plugin</artifactId> -->
+<!-- 				<version>0.26.0</version> -->
+<!-- 				<configuration> -->
+<!-- 					<dockerHost>https://192.168.99.100:2376</dockerHost> -->
+<!-- 					<verbose>true</verbose> -->
+
+<!-- 					<image> -->
+<!-- 						<name>${docker.image.prefix}/${docker.image.name}</name> -->
+<!-- 						<build> -->
+<!-- 							<dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir> -->
+<!-- 							<assembly> -->
+<!-- 								<descriptorRef>artifact</descriptorRef> -->
+<!-- 							</assembly> -->
+<!-- 							<tags> -->
+<!-- 								<tag>latest</tag> -->
+<!-- 								<tag>${project.version}</tag> -->
+<!-- 							</tags> -->
+<!-- 						</build> -->
+<!-- 						<run> -->
+<!-- 							<ports>8080:8080</ports> -->
+
+<!-- 							<links> -->
+<!-- 								<link>mongoDb:mongo</link> -->
+<!-- 							</links> -->
+<!-- 							<dependsOn> -->
+<!-- 								<container>mongo</container> -->
+<!-- 							</dependsOn> -->
+
+<!-- 							<wait> -->
+<!-- 								<http> -->
+<!-- 									<url>http://192.168.99.100:8080/health</url> -->
+<!-- 									<method>GET</method> -->
+<!-- 									<status>200</status> -->
+<!-- 								</http> -->
+<!-- 								<time>7000</time> -->
+<!-- 							</wait> -->
+<!-- 						</run> -->
+<!-- 					</image> -->
+
+<!-- 					<images> -->
+<!-- 						<image> -->
+<!-- 							<name>mongo</name> -->
+<!-- 							<alias>mongoDb</alias> -->
+<!-- 							<run> -->
+<!-- 								<ports>27017:27017</ports> -->
+<!-- 								<wait>1000</wait> -->
+<!-- 							</run> -->
+<!-- 						</image> -->
+
+
+
+
+
+
+
+<!-- 					</images> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+
+
+
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.20.0</version>
+
+				<configuration>
+
+                    <dockerHost>https://192.168.99.100:2376</dockerHost>
+
+                    <verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<build>
+								<dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                                <!--copies artficact to docker build dir in target-->
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                </ports>
+                                <links>
+                                    <link>mongo:mongoDb</link>
+                                    <link>rabbitmq:myrabbitmq</link>
+                                </links>
+<!--                                 <env> -->
+<!--                                     <SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST> -->
+<!--                                 </env> -->
+                               <dependsOn>
+                                    <container>mongoDb</container>
+                                    <container>myrabbitmq</container>
+                                </dependsOn>
+                            </run>
+						</image>
+                        <!--mysql container-->
+						<image>
+							<name>mongo</name>
+                            <alias>mongoDb</alias>
+							<run>
+                                <!--expose port for dn-->
+								<ports>
+                                    <port>27017:27017</port>
+                                </ports>
+                                <!--set env prams for mysql image-->
+<!--                                 <env> -->
+<!--                                     <MYSQL_DATABASE>pageviewservice</MYSQL_DATABASE> -->
+<!--                                     <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD> -->
+<!--                                 </env> -->
+<!--                                 wait for db to start -->
+                                <wait>
+                                    <time>10000</time>
+                                </wait>
+							</run>
+						</image>
+                        <!-- rabbit container -->
+                        <image>
+                            <name>rabbitmq</name>
+                            <alias>myrabbitmq</alias>
+                            <run>
+                                <ports>
+                                    <port>5671</port>
+                                    <port>5672</port>
+                                    <port>4369</port>
+                                    <port>25672</port>
+                                </ports>
+                                wait for db to start
+                                <wait>
+                                    <time>10000</time>
+                                </wait>
+                            </run>
+                        </image>
+
+                        <!--docker run &#45;&#45;name pageviewservice -p 8081:8081 &#45;&#45;link rabbitmq:rabbitmq &#45;&#45;link mysqldb:mysqldb-->
+                        <!-- -e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice -e SPRING_PROFILES_ACTIVE=mysql-->
+                        <!-- -e SPRING_RABBITMQ_HOST=rabbitmq springframeworkguru/pageviewservice-->
+<!--                         <image> -->
+<!--                             <name>springframeworkguru/pageviewservice</name> -->
+<!--                             <alias>pageviewservice</alias> -->
+<!--                             <run> -->
+<!--                                 <ports> -->
+<!--                                     <port>8081:8081</port> -->
+<!--                                 </ports> -->
+<!--                                 <links> -->
+<!--                                     <link>myrabbitmq:rabbitmq</link> -->
+<!--                                     <link>mysqldb:mysqldb</link> -->
+<!--                                 </links> -->
+<!--                                 <env> -->
+<!--                                     <SPRING_DATASOURCE_URL>jdbc:mysql://mysqldb:3306/pageviewservice</SPRING_DATASOURCE_URL> -->
+<!--                                     <SPRING_PROFILES_ACTIVE>mysql</SPRING_PROFILES_ACTIVE> -->
+<!--                                     <SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST> -->
+<!--                                 </env> -->
+<!--                                 <dependsOn> -->
+<!--                                     <container>myrabbitmq</container> -->
+<!--                                     <container>mysql</container> -->
+<!--                                 </dependsOn> -->
+<!--                                 <wait> -->
+<!--                                     <http> -->
+<!--                                         <url>http://192.168.99.100:8081/health</url> -->
+<!--                                         <method>GET</method> -->
+<!--                                         <status>200..399</status> -->
+<!--                                     </http> -->
+<!--                                     <time>75000</time> -->
+<!--                                 </wait> -->
+<!--                             </run> -->
+<!--                         </image> -->
+					</images>
+				</configuration>
+			</plugin>
+			
+			
+
+		</plugins>
+	</build>
+
+</project>
