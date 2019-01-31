@@ -1,0 +1,117 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @karthikgit28 Sign out
+6
+16 80 springframeworkguru/spring-boot-docker
+ Code  Issues 0  Pull requests 3  Projects 0  Wiki  Insights
+spring-boot-docker/src/main/scripts/sfgapp-stack/docker-compose.yml
+57fb828  on May 15, 2017
+@springframeworkguru springframeworkguru adding secrets
+     
+87 lines (83 sloc)  1.78 KB
+version: '3.1'
+
+services:
+  mysqldb:
+    image: mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: pageviewservice
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD_FILE: '/run/secrets/mysql.txt'
+    networks:
+      - database_net
+    deploy:
+      replicas: 1
+    secrets:
+      - mysql.txt
+
+  rabbitmq:
+    image: rabbitmq
+    restart: always
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "4369:4369"
+      - "25672:25672"
+    networks:
+      - rabbit_net
+    deploy:
+      replicas: 1
+
+  pageviewservice:
+    image: springframeworkguru/pageviewservice
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - mysqldb
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:mysql://mysqldb:3306/pageviewservice'
+      SPRING_PROFILES_ACTIVE: 'mysql'
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_CONFIG_LOCATION: 'file:run/secrets/'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rabbit_net
+      - database_net
+    deploy:
+      replicas: 3
+    secrets:
+      - application.properties
+
+  springbootdocker:
+    image: springframeworkguru/springbootdocker
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - rabbitmq
+      - pageviewservice
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rabbit_net
+    deploy:
+      replicas: 3
+networks:
+  rabbit_net:
+    driver: overlay
+  database_net:
+    driver: overlay
+secrets:
+  mysql.txt:
+    external: true
+  application.properties:
+    file: ./application.properties
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.

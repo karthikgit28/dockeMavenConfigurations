@@ -1,0 +1,37 @@
+version: '3'
+services:
+    db:
+        image: mongo
+        volumes:
+            - db_data:/data/db
+        restart: always
+        environment:
+             MONGO_INITDB_ROOT_USERNAME: wordpress
+             MONGO_INITDB_ROOT_PASSWORD: wordpress
+        networks:
+            - database_net
+        deploy:
+             replicas: 1
+        
+    application:
+        image: dockerkarthik28/dockertestingfabric:latest
+        ports:
+            - '8080:8080'
+        depends_on:
+            - db
+        restart: always
+        networks:
+            - database_net
+        deploy:
+              replicas: 2
+        healthcheck:
+              test: ["CMD", "curl", "-f", "http://192.168.99.100:8080/health"]
+              interval: 1m30s
+              timeout: 10s
+              retries: 3
+        
+volumes:
+    db_data:
+networks:
+    database_net:
+         driver: karthik
